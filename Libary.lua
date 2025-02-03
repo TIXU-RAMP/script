@@ -141,7 +141,6 @@ function library:CreateWindow(title)
         button.MouseButton1Click:Connect(callback or function() end)
     end
 
-    -- Add Label
     function windowFunctions:AddLabel(labelText)
         local label = Instance.new("TextLabel")
         label.Text = labelText or "Label"
@@ -159,7 +158,6 @@ function library:CreateWindow(title)
         updateCanvasSize(content)
     end
 
-    -- Add Toggle with Subtitle
     function windowFunctions:AddToggleWithSubtitle(toggleText, subtitleText, callback)
         local toggleFrame = Instance.new("Frame")
         toggleFrame.Size = UDim2.new(1, -20, 0, 60)
@@ -213,7 +211,6 @@ function library:CreateWindow(title)
         textBoxFrame.Parent = content
         createCorner(textBoxFrame)
 
-        -- TextBox
         local textBox = Instance.new("TextBox")
         textBox.Text = textBoxText or ""
         textBox.Size = UDim2.new(1, -20, 0, 30)
@@ -225,7 +222,6 @@ function library:CreateWindow(title)
         textBox.ClearTextOnFocus = false
         textBox.Parent = textBoxFrame
 
-        -- Subtitle for TextBox
         local subtitle = Instance.new("TextLabel")
         subtitle.Text = subtitleText or "Subtitle"
         subtitle.Size = UDim2.new(1, -20, 0, 20)
