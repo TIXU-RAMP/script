@@ -83,6 +83,7 @@ function Library:Tab(name)
             TextSize = 14,
         })
         Button.MouseButton1Click:Connect(func)
+        Button.TouchTap:Connect(func) -- Added support for mobile touch input
     end
 
     function TabLibrary:DropDown(text, drops, func)
@@ -138,6 +139,10 @@ function Library:Tab(name)
                 TextSize = 14,
             })
             DropButton.MouseButton1Click:Connect(function()
+                DropDownFrame:TweenSize(UDim2.new(0, 120, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Sine, 0.25, true)
+                func(v)
+            end)
+            DropButton.TouchTap:Connect(function()  -- Added for mobile support
                 DropDownFrame:TweenSize(UDim2.new(0, 120, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Sine, 0.25, true)
                 func(v)
             end)
@@ -205,6 +210,11 @@ function Library:Tab(name)
         })
 
         ToggleButton.MouseButton1Click:Connect(function()
+            local isOn = ToggleButton.BackgroundColor3 == Color3.new(0, 1, 0)
+            ToggleButton.BackgroundColor3 = isOn and Color3.new(1, 0, 0) or Color3.new(0, 1, 0)
+            func(not isOn)
+        end)
+        ToggleButton.TouchTap:Connect(function() -- Added for mobile support
             local isOn = ToggleButton.BackgroundColor3 == Color3.new(0, 1, 0)
             ToggleButton.BackgroundColor3 = isOn and Color3.new(1, 0, 0) or Color3.new(0, 1, 0)
             func(not isOn)
