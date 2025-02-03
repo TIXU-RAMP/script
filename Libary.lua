@@ -193,7 +193,7 @@ function library:CreateWindow(title)
         local state = false
         toggleButton.MouseButton1Click:Connect(function()
             state = not state
-            toggleButton.Text = state and "ON" or "OFF"
+            toggleButton.Text = state and "✅️" or "❎️"
             toggleButton.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
             if callback then callback(state) end
         end)
