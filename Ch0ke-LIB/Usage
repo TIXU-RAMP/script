@@ -1,4 +1,4 @@
-local VLib = loadstring(game:HttpGet("https://pastebin.com/raw/Mb49kKTP"))()
+local VLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAMP/T/refs/heads/main/Ch0ke-LIB/CODE.lua"))()
 
 
 		MAINTTL = "NBT HUB" 
