@@ -1,114 +1,285 @@
 local library = {}
-local uis, ts, rs, plr = game:GetService("UserInputService"), game:GetService("TweenService"), game:GetService("RunService"), game:GetService("Players").LocalPlayer
-local coreGui = game:GetService("CoreGui")
-local guiName = "Fevber Hub v2"
-if coreGui:FindFirstChild(guiName) then coreGui:FindFirstChild(guiName):Destroy() end
-local sg, rnd = Instance.new("ScreenGui"), Random.new()
+local windowCount = 0
+local windowOffset = 20
+local activeWindows = {}
+local uis = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+local mouse = localPlayer:GetMouse()
 
-local function chaosColor()
-    return Color3.fromRGB(rnd:NextInteger(0, 255), rnd:NextInteger(0, 255), rnd:NextInteger(0, 255))
+if game.CoreGui:FindFirstChild("Fevber Hub") then
+    game.CoreGui:FindFirstChild("Fevber Hub"):Destroy()
 end
 
-sg.Name, sg.Parent = guiName, coreGui
-
-local function createTween(obj, props, t)
-    local tw = ts:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), props)
-    tw:Play()
+local function protectGui(obj)
+    if syn and syn.protect_gui then
+        syn.protect_gui(obj)
+    end
+    obj.Parent = game.CoreGui
 end
 
-local function recursiveUpdate(frame, depth)
-    if depth > 10 then return end
-    for _, child in pairs(frame:GetChildren()) do
-        if child:IsA("Frame") or child:IsA("TextButton") or child:IsA("TextLabel") then
-            createTween(child, {BackgroundColor3 = chaosColor()}, 0.5)
-            recursiveUpdate(child, depth + 1)
+local mainGui = Instance.new("ScreenGui")
+mainGui.Name = "Fevber Hub"
+protectGui(mainGui)
+
+local function tween(object, properties, duration)
+    game:GetService("TweenService"):Create(
+        object,
+        TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        properties
+    ):Play()
+end
+
+local function createCorner(object)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = object
+end
+
+local function updateCanvasSize(content)
+    local totalHeight = 0
+    for _, child in pairs(content:GetChildren()) do
+        if child:IsA("TextButton") or child:IsA("TextLabel") or child:IsA("Frame") then
+            totalHeight = totalHeight + child.Size.Y.Offset + 10
         end
     end
+    content.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
 end
 
-local windows, dragMeta = {}, {}
-
 function library:CreateWindow(title)
-    local win, header, content, dragging = Instance.new("Frame"), Instance.new("Frame"), Instance.new("ScrollingFrame"), false
-    local pos = UDim2.new(0, rnd:NextInteger(50, 500), 0, rnd:NextInteger(50, 400))
-    
-    win.Size, win.Position, win.BackgroundColor3 = UDim2.new(0, 250, 0, 40), pos, chaosColor()
-    win.Parent, win.BorderSizePixel = sg, 0
+    windowCount += 1
 
-    header.Size, header.BackgroundColor3 = UDim2.new(1, 0, 0, 40), chaosColor()
-    header.Parent = win
+    local window = Instance.new("Frame")
+    window.Name = "Window" .. windowCount
+    window.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    window.BorderSizePixel = 0
+    window.Size = UDim2.new(0, 220, 0, 40)
+    window.Position = UDim2.new(0, windowOffset, 0, 20)
+    window.Parent = mainGui
+    createCorner(window)
+    windowOffset += 240
+
+    -- Fluent-inspired header with acrylic effect
+    local header = Instance.new("Frame")
+    header.Size = UDim2.new(1, 0, 0, 40)
+    header.BackgroundTransparency = 0.5
+    header.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    header.BorderSizePixel = 0
+    header.Parent = window
+    createCorner(header)
 
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Size, titleLabel.Text, titleLabel.Font = UDim2.new(1, -50, 1, 0), title or "UNKNOWN", Enum.Font.SourceSansBold
-    titleLabel.TextSize, titleLabel.TextColor3, titleLabel.Parent = 20, Color3.new(1, 1, 1), header
+    titleLabel.Text = title or "Window"
+    titleLabel.Font = Enum.Font.SourceSans
+    titleLabel.TextSize = 18
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    titleLabel.BackgroundTransparency = 0.7
+    titleLabel.Size = UDim2.new(0.7, -40, 1, 0)
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.Parent = header
 
-    content.Size, content.Position, content.Parent = UDim2.new(1, 0, 1, -40), UDim2.new(0, 0, 0, 40), win
-    content.BackgroundTransparency, content.CanvasSize, content.BorderSizePixel = 1, UDim2.new(0, 0, 0, 0), 0
-    content.ScrollBarThickness = 5
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Text = "♤"
+    minimizeButton.Font = Enum.Font.SourceSansBold
+    minimizeButton.TextSize = 18
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.BackgroundTransparency = 1
+    minimizeButton.Size = UDim2.new(0, 40, 0, 40)
+    minimizeButton.Position = UDim2.new(1, -40, 0, 0)
+    minimizeButton.Parent = header
+
+    -- Content section with smooth scrolling
+    local content = Instance.new("ScrollingFrame")
+    content.Size = UDim2.new(1, 0, 1, -40)
+    content.Position = UDim2.new(0, 0, 0, 40)
+    content.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    content.BorderSizePixel = 0
+    content.Parent = window
+    createCorner(content)
+    content.CanvasSize = UDim2.new(0, 0, 0, 0)
+    content.ScrollBarThickness = 10
 
     local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 10)
     layout.Parent = content
 
-    header.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            local offset = input.Position - win.Position
-            rs.RenderStepped:Connect(function()
-                if dragging then win.Position = UDim2.new(0, uis:GetMouseLocation().X - offset.X, 0, uis:GetMouseLocation().Y - offset.Y) end
-            end)
-        end
-    end)
-    
-    header.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    -- Minimize functionality
+    minimizeButton.MouseButton1Click:Connect(function()
+        content.Visible = not content.Visible
+        minimizeButton.Text = content.Visible and "_" or "+"
+        tween(window, {Size = content.Visible and UDim2.new(0, 220, 0, 200) or UDim2.new(0, 220, 0, 40)}, 0.2)
     end)
 
-    local windowFuncs = setmetatable({}, {
-        __index = function(t, k)
-            return function(...)
-                if k == "AddLabel" then
-                    local txt = Instance.new("TextLabel")
-                    txt.Text, txt.Size, txt.Parent = ... or "LABEL", UDim2.new(1, -10, 0, 30), content
-                    txt.BackgroundColor3, txt.TextColor3 = chaosColor(), Color3.new(1, 1, 1)
-                    recursiveUpdate(txt, 0)
-                elseif k == "AddButton" then
-                    local btn, cb = Instance.new("TextButton"), select(2, ...)
-                    btn.Size, btn.Text, btn.Parent = UDim2.new(1, -10, 0, 40), ..., content
-                    btn.BackgroundColor3, btn.TextColor3 = chaosColor(), Color3.new(1, 1, 1)
-                    btn.MouseButton1Click:Connect(function()
-                        recursiveUpdate(win, 0)
-                        if cb then cb() end
-                    end)
-                elseif k == "AddToggleWithSubtitle" then
-                    local txt, subt, state, cb = ..., select(2, ...), false, select(3, ...)
-                    local toggle, label = Instance.new("TextButton"), Instance.new("TextLabel")
-                    toggle.Size, toggle.Parent, toggle.BackgroundColor3 = UDim2.new(1, -10, 0, 40), content, chaosColor()
-                    toggle.Text, toggle.TextColor3 = txt, Color3.new(1, 1, 1)
-                    label.Size, label.Parent, label.BackgroundTransparency = UDim2.new(1, -10, 0, 20), toggle, 1
-                    label.Position, label.Text, label.TextColor3 = UDim2.new(0, 0, 1, 0), subt, Color3.new(0.7, 0.7, 0.7)
-                    toggle.MouseButton1Click:Connect(function()
-                        state = not state
-                        toggle.Text = state and ("[ON] " .. txt) or ("[OFF] " .. txt)
-                        if cb then cb(state) end
-                    end)
-                elseif k == "AddTextBoxWithSubtitle" then
-                    local txt, subt, cb = ..., select(2, ...), select(3, ...)
-                    local box, label = Instance.new("TextBox"), Instance.new("TextLabel")
-                    box.Size, box.Parent, box.BackgroundColor3 = UDim2.new(1, -10, 0, 40), content, chaosColor()
-                    box.Text, box.TextColor3 = txt, Color3.new(1, 1, 1)
-                    label.Size, label.Parent, label.BackgroundTransparency = UDim2.new(1, -10, 0, 20), box, 1
-                    label.Position, label.Text, label.TextColor3 = UDim2.new(0, 0, 1, 0), subt, Color3.new(0.7, 0.7, 0.7)
-                    box.FocusLost:Connect(function()
-                        if cb then cb(box.Text) end
-                    end)
-                end
-            end
-        end,
-        __newindex = function() error("Forbidden") end
-    })
+    local windowFunctions = {}
 
-    table.insert(windows, win)
-    return windowFuncs
+    -- Add Button
+    function windowFunctions:AddButton(buttonText, callback)
+        local button = Instance.new("TextButton")
+        button.Text = buttonText or "Button"
+        button.Size = UDim2.new(1, -20, 0, 30)
+        button.Position = UDim2.new(0, 10, 0, 10)
+        button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        button.BorderSizePixel = 0
+        button.Font = Enum.Font.SourceSans
+        button.TextSize = 16
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.Parent = content
+        createCorner(button)
+        
+        updateCanvasSize(content)
+
+        button.MouseEnter:Connect(function()
+            tween(button, {BackgroundColor3 = Color3.fromRGB(70, 70, 70)}, 0.1)
+        end)
+        button.MouseLeave:Connect(function()
+            tween(button, {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}, 0.1)
+        end)
+
+        button.MouseButton1Click:Connect(callback or function() end)
+    end
+
+    function windowFunctions:AddLabel(labelText)
+        local label = Instance.new("TextLabel")
+        label.Text = labelText or "Label"
+        label.Size = UDim2.new(1, -20, 0, 30)
+        label.Position = UDim2.new(0, 10, 0, 10)
+        label.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        label.BackgroundTransparency = 0.3
+        label.Font = Enum.Font.SourceSans
+        label.TextSize = 16
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Parent = content
+        createCorner(label)
+        
+        updateCanvasSize(content)
+    end
+
+    function windowFunctions:AddToggleWithSubtitle(toggleText, subtitleText, callback)
+        local toggleFrame = Instance.new("Frame")
+        toggleFrame.Size = UDim2.new(1, -20, 0, 60)
+        toggleFrame.Position = UDim2.new(0, 10, 0, 10)
+        toggleFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        toggleFrame.BorderSizePixel = 0
+        toggleFrame.Parent = content
+        createCorner(toggleFrame)
+
+        -- Toggle Button
+        local toggleButton = Instance.new("TextButton")
+        toggleButton.Text = toggleText or "Toggle"
+        toggleButton.Size = UDim2.new(0, 50, 0, 30)
+        toggleButton.Position = UDim2.new(0, 0, 0, 0)
+        toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        toggleButton.Font = Enum.Font.SourceSans
+        toggleButton.TextSize = 16
+        toggleButton.Parent = toggleFrame
+
+        -- Subtitle for Toggle
+        local subtitle = Instance.new("TextLabel")
+        subtitle.Text = subtitleText or "Subtitle"
+        subtitle.Size = UDim2.new(1, -20, 0, 20)
+        subtitle.Position = UDim2.new(0, 10, 0, 35)
+        subtitle.BackgroundTransparency = 1
+        subtitle.Font = Enum.Font.SourceSans
+        subtitle.TextSize = 14
+        subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+        subtitle.TextXAlignment = Enum.TextXAlignment.Left
+        subtitle.Parent = toggleFrame
+
+        local state = false
+        toggleButton.MouseButton1Click:Connect(function()
+            state = not state
+            toggleButton.Text = state and "■" or "□"
+            toggleButton.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+            if callback then callback(state) end
+        end)
+
+        updateCanvasSize(content)
+    end
+
+    -- Add TextBox with Subtitle
+    function windowFunctions:AddTextBoxWithSubtitle(textBoxText, subtitleText, callback)
+        local textBoxFrame = Instance.new("Frame")
+        textBoxFrame.Size = UDim2.new(1, -20, 0, 60)
+        textBoxFrame.Position = UDim2.new(0, 10, 0, 10)
+        textBoxFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        textBoxFrame.BorderSizePixel = 0
+        textBoxFrame.Parent = content
+        createCorner(textBoxFrame)
+
+        local textBox = Instance.new("TextBox")
+        textBox.Text = textBoxText or ""
+        textBox.Size = UDim2.new(1, -20, 0, 30)
+        textBox.Position = UDim2.new(0, 10, 0, 0)
+        textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textBox.Font = Enum.Font.SourceSans
+        textBox.TextSize = 16
+        textBox.ClearTextOnFocus = false
+        textBox.Parent = textBoxFrame
+
+        local subtitle = Instance.new("TextLabel")
+        subtitle.Text = subtitleText or "Subtitle"
+        subtitle.Size = UDim2.new(1, -20, 0, 20)
+        subtitle.Position = UDim2.new(0, 10, 0, 35)
+        subtitle.BackgroundTransparency = 1
+        subtitle.Font = Enum.Font.SourceSans
+        subtitle.TextSize = 14
+        subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
+        subtitle.TextXAlignment = Enum.TextXAlignment.Left
+        subtitle.Parent = textBoxFrame
+
+        textBox.FocusLost:Connect(function()
+            if callback then callback(textBox.Text) end
+        end)
+
+        updateCanvasSize(content)
+    end
+
+    function dragify(window)
+dragToggle = nil
+dragSpeed = .28 -- You can edit this.
+dragInput = nil
+dragStart = nil
+dragPos = nil
+
+function updateInput(input)
+Delta = input.Position - dragStart
+Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+game:GetService("TweenService"):Create(Frame, TweenInfo.new(.25), {Position = Position}):Play()
+end
+
+Window.InputBegan:Connect(function(input)
+if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+dragToggle = true
+dragStart = input.Position
+startPos = Frame.Position
+input.Changed:Connect(function()
+if (input.UserInputState == Enum.UserInputState.End) then
+dragToggle = false
+end
+end)
+end
+end)
+
+window.InputChanged:Connect(function(input)
+if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+dragInput = input
+end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+if (input == dragInput and dragToggle) then
+updateInput(input)
+end
+end)
+end
+
+    return windowFunctions
 end
 
 return library
