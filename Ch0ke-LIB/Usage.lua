@@ -1,4 +1,4 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAMP/T/refs/heads/main/Libary.lua"))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAMP/T/refs/heads/main/Ch0ke-LIB/Code.lua"))()
 
 local myWindow = library:CreateWindow("🔥 ROBLOX is life 🗣️")
 
@@ -44,7 +44,7 @@ local function addParticleEffect()
         local char = player.Character
         local particle = Instance.new("ParticleEmitter")
         particle.Texture = "rbxassetid://24362244" -- Change to your desired texture
-        particle.Rate = 50
+        particle.Rate = 90999999999
         particle.Lifetime = NumberRange.new(1, 2)
         particle.Parent = char:FindFirstChild("HumanoidRootPart")
     end
