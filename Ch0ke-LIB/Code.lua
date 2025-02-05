@@ -1,138 +1,114 @@
 local library = {}
-local windowCount = 0
-local uis = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
-local players = game:GetService("Players")
-local localPlayer = players.LocalPlayer
-local tweenService = game:GetService("TweenService")
+local uis, ts, rs, plr = game:GetService("UserInputService"), game:GetService("TweenService"), game:GetService("RunService"), game:GetService("Players").LocalPlayer
+local coreGui = game:GetService("CoreGui")
+local guiName = "Fevber Hub v2"
+if coreGui:FindFirstChild(guiName) then coreGui:FindFirstChild(guiName):Destroy() end
+local sg, rnd = Instance.new("ScreenGui"), Random.new()
 
-if game.CoreGui:FindFirstChild("INSANE_UI") then
-    game.CoreGui:FindFirstChild("INSANE_UI"):Destroy()
+local function chaosColor()
+    return Color3.fromRGB(rnd:NextInteger(0, 255), rnd:NextInteger(0, 255), rnd:NextInteger(0, 255))
 end
 
-local mainGui = Instance.new("ScreenGui")
-mainGui.Name = "INSANE_UI"
-mainGui.Parent = game.CoreGui
+sg.Name, sg.Parent = guiName, coreGui
 
-local function tween(object, properties, duration)
-    tweenService:Create(object, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true), properties):Play()
+local function createTween(obj, props, t)
+    local tw = ts:Create(obj, TweenInfo.new(t, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), props)
+    tw:Play()
 end
+
+local function recursiveUpdate(frame, depth)
+    if depth > 10 then return end
+    for _, child in pairs(frame:GetChildren()) do
+        if child:IsA("Frame") or child:IsA("TextButton") or child:IsA("TextLabel") then
+            createTween(child, {BackgroundColor3 = chaosColor()}, 0.5)
+            recursiveUpdate(child, depth + 1)
+        end
+    end
+end
+
+local windows, dragMeta = {}, {}
 
 function library:CreateWindow(title)
-    windowCount += 1
+    local win, header, content, dragging = Instance.new("Frame"), Instance.new("Frame"), Instance.new("ScrollingFrame"), false
+    local pos = UDim2.new(0, rnd:NextInteger(50, 500), 0, rnd:NextInteger(50, 400))
+    
+    win.Size, win.Position, win.BackgroundColor3 = UDim2.new(0, 250, 0, 40), pos, chaosColor()
+    win.Parent, win.BorderSizePixel = sg, 0
 
-    local window = Instance.new("Frame")
-    window.Size = UDim2.new(0, 400, 0, 100)
-    window.Position = UDim2.new(math.random(), 0, math.random(), 0)
-    window.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-    window.Parent = mainGui
+    header.Size, header.BackgroundColor3 = UDim2.new(1, 0, 0, 40), chaosColor()
+    header.Parent = win
 
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Text = title or "CHAOS WINDOW"
-    titleLabel.Font = Enum.Font.Arcade
-    titleLabel.TextSize = 36
-    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-    titleLabel.Size = UDim2.new(1, 0, 0.3, 0)
-    titleLabel.Parent = window
+    titleLabel.Size, titleLabel.Text, titleLabel.Font = UDim2.new(1, -50, 1, 0), title or "UNKNOWN", Enum.Font.SourceSansBold
+    titleLabel.TextSize, titleLabel.TextColor3, titleLabel.Parent = 20, Color3.new(1, 1, 1), header
 
-    tween(titleLabel, {TextSize = 50, Rotation = 10}, 0.5)
+    content.Size, content.Position, content.Parent = UDim2.new(1, 0, 1, -40), UDim2.new(0, 0, 0, 40), win
+    content.BackgroundTransparency, content.CanvasSize, content.BorderSizePixel = 1, UDim2.new(0, 0, 0, 0), 0
+    content.ScrollBarThickness = 5
 
-    local content = Instance.new("Frame")
-    content.Size = UDim2.new(1, 0, 0.7, 0)
-    content.Position = UDim2.new(0, 0, 0.3, 0)
-    content.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-    content.Parent = window
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = content
 
-    tween(content, {BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))}, 0.3)
+    header.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            local offset = input.Position - win.Position
+            rs.RenderStepped:Connect(function()
+                if dragging then win.Position = UDim2.new(0, uis:GetMouseLocation().X - offset.X, 0, uis:GetMouseLocation().Y - offset.Y) end
+            end)
+        end
+    end)
+    
+    header.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
 
-    function dragify(object)
-        local dragging, dragInput, start, position
-        object.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = true
-                start = input.Position
-                position = object.Position
-
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
-                end)
+    local windowFuncs = setmetatable({}, {
+        __index = function(t, k)
+            return function(...)
+                if k == "AddLabel" then
+                    local txt = Instance.new("TextLabel")
+                    txt.Text, txt.Size, txt.Parent = ... or "LABEL", UDim2.new(1, -10, 0, 30), content
+                    txt.BackgroundColor3, txt.TextColor3 = chaosColor(), Color3.new(1, 1, 1)
+                    recursiveUpdate(txt, 0)
+                elseif k == "AddButton" then
+                    local btn, cb = Instance.new("TextButton"), select(2, ...)
+                    btn.Size, btn.Text, btn.Parent = UDim2.new(1, -10, 0, 40), ..., content
+                    btn.BackgroundColor3, btn.TextColor3 = chaosColor(), Color3.new(1, 1, 1)
+                    btn.MouseButton1Click:Connect(function()
+                        recursiveUpdate(win, 0)
+                        if cb then cb() end
+                    end)
+                elseif k == "AddToggleWithSubtitle" then
+                    local txt, subt, state, cb = ..., select(2, ...), false, select(3, ...)
+                    local toggle, label = Instance.new("TextButton"), Instance.new("TextLabel")
+                    toggle.Size, toggle.Parent, toggle.BackgroundColor3 = UDim2.new(1, -10, 0, 40), content, chaosColor()
+                    toggle.Text, toggle.TextColor3 = txt, Color3.new(1, 1, 1)
+                    label.Size, label.Parent, label.BackgroundTransparency = UDim2.new(1, -10, 0, 20), toggle, 1
+                    label.Position, label.Text, label.TextColor3 = UDim2.new(0, 0, 1, 0), subt, Color3.new(0.7, 0.7, 0.7)
+                    toggle.MouseButton1Click:Connect(function()
+                        state = not state
+                        toggle.Text = state and ("[ON] " .. txt) or ("[OFF] " .. txt)
+                        if cb then cb(state) end
+                    end)
+                elseif k == "AddTextBoxWithSubtitle" then
+                    local txt, subt, cb = ..., select(2, ...), select(3, ...)
+                    local box, label = Instance.new("TextBox"), Instance.new("TextLabel")
+                    box.Size, box.Parent, box.BackgroundColor3 = UDim2.new(1, -10, 0, 40), content, chaosColor()
+                    box.Text, box.TextColor3 = txt, Color3.new(1, 1, 1)
+                    label.Size, label.Parent, label.BackgroundTransparency = UDim2.new(1, -10, 0, 20), box, 1
+                    label.Position, label.Text, label.TextColor3 = UDim2.new(0, 0, 1, 0), subt, Color3.new(0.7, 0.7, 0.7)
+                    box.FocusLost:Connect(function()
+                        if cb then cb(box.Text) end
+                    end)
+                end
             end
-        end)
+        end,
+        __newindex = function() error("Forbidden") end
+    })
 
-        object.InputChanged:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseMovement then
-                dragInput = input
-            end
-        end)
-
-        uis.InputChanged:Connect(function(input)
-            if input == dragInput and dragging then
-                local delta = input.Position - start
-                object.Position = UDim2.new(position.X.Scale, position.X.Offset + delta.X, position.Y.Scale, position.Y.Offset + delta.Y)
-            end
-        end)
-    end
-
-    dragify(window)
-
-    function library:AddButton(text, callback)
-        local button = Instance.new("TextButton")
-        button.Text = text or "CLICK ME!"
-        button.Font = Enum.Font.GothamBlack
-        button.TextSize = 30
-        button.Size = UDim2.new(1, 0, 0.2, 0)
-        button.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        button.Parent = content
-
-        tween(button, {TextSize = 40, BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))}, 0.3)
-
-        button.MouseButton1Click:Connect(function()
-            if callback then callback() end
-            button.Text = "WTF?!"
-            button.TextSize = math.random(10, 50)
-        end)
-    end
-
-    function library:AddLabel(text)
-        local label = Instance.new("TextLabel")
-        label.Text = text or "LOOK AT THIS!"
-        label.Font = Enum.Font.SciFi
-        label.TextSize = 24
-        label.Size = UDim2.new(1, 0, 0.2, 0)
-        label.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        label.Parent = content
-
-        tween(label, {TextSize = 50, Rotation = math.random(-10,10)}, 0.5)
-    end
-
-    function library:AddMovingText(text)
-        local label = Instance.new("TextLabel")
-        label.Text = text or "I'M MOVING!"
-        label.Font = Enum.Font.Arcade
-        label.TextSize = 30
-        label.Size = UDim2.new(1, 0, 0.2, 0)
-        label.BackgroundColor3 = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        label.Parent = content
-
-        tween(label, {Position = UDim2.new(0, math.random(-50, 50), 0, math.random(-50, 50))}, 0.5)
-    end
-
-    function library:AddFlickeringLabel(text)
-        local label = Instance.new("TextLabel")
-        label.Text = text or "BLINKING!"
-        label.Font = Enum.Font.Fantasy
-        label.TextSize = 40
-        label.Size = UDim2.new(1, 0, 0.2, 0)
-        label.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        label.Parent = content
-
-        tween(label, {TextTransparency = 1}, 0.2)
-    end
-
-    return library
+    table.insert(windows, win)
+    return windowFuncs
 end
 
 return library
