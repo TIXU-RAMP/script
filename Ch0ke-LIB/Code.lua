@@ -82,7 +82,7 @@ function library:CreateWindow(title)
     titleLabel.Parent = header
 
     local minimizeButton = Instance.new("TextButton")
-    minimizeButton.Text = "_"
+    minimizeButton.Text = "♤"
     minimizeButton.Font = Enum.Font.SourceSansBold
     minimizeButton.TextSize = 18
     minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -193,7 +193,7 @@ function library:CreateWindow(title)
         local state = false
         toggleButton.MouseButton1Click:Connect(function()
             state = not state
-            toggleButton.Text = state and "✅️" or "❎️"
+            toggleButton.Text = state and "■" or "□"
             toggleButton.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
             if callback then callback(state) end
         end)
@@ -240,7 +240,7 @@ function library:CreateWindow(title)
         updateCanvasSize(content)
     end
 
-    function dragify(Frame)
+    function dragify(window)
 dragToggle = nil
 dragSpeed = .28 -- You can edit this.
 dragInput = nil
@@ -253,7 +253,7 @@ Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.S
 game:GetService("TweenService"):Create(Frame, TweenInfo.new(.25), {Position = Position}):Play()
 end
 
-Frame.InputBegan:Connect(function(input)
+Window.InputBegan:Connect(function(input)
 if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
 dragToggle = true
 dragStart = input.Position
@@ -266,7 +266,7 @@ end)
 end
 end)
 
-Frame.InputChanged:Connect(function(input)
+window.InputChanged:Connect(function(input)
 if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 dragInput = input
 end
