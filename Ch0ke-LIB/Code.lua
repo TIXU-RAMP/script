@@ -1,144 +1,95 @@
-local UILibrary = {}
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
+local Library = {}
+local UILib = Instance.new("ScreenGui")
+local TabXPosition = 30
 
-local function Tween(obj, props, duration)
-    TweenService:Create(obj, TweenInfo.new(duration, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), props):Play()
+UILib.Name = "UILib"
+UILib.Parent = game:GetService("CoreGui")
+UILib.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+function CreateUICorner(parent, radius)
+	local UICorner = Instance.new("UICorner")
+	UICorner.CornerRadius = UDim.new(0, radius)
+	UICorner.Parent = parent
 end
 
-function UILibrary:CreateWindow(title)
-    local ScreenGui = Instance.new("ScreenGui")
-    local MainFrame = Instance.new("Frame")
-    local TopBar = Instance.new("Frame")
-    local TitleLabel = Instance.new("TextLabel")
-    local BlurEffect = Instance.new("BlurEffect")
-    
-    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    
-    -- Blur Effect
-    BlurEffect.Size = 10
-    BlurEffect.Parent = game.Lighting
-    Tween(BlurEffect, {Size = 25}, 1)
-    
-    -- Main Window
-    MainFrame.Size = UDim2.new(0, 450, 0, 350)
-    MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    MainFrame.BorderSizePixel = 2
-    MainFrame.Parent = ScreenGui
-    MainFrame.ClipsDescendants = true
-    
-    -- Top Bar
-    TopBar.Size = UDim2.new(1, 0, 0, 40)
-    TopBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    TopBar.Parent = MainFrame
-    
-    -- Title
-    TitleLabel.Size = UDim2.new(1, 0, 1, 0)
-    TitleLabel.Text = title
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.Font = Enum.Font.GothamBold
-    TitleLabel.TextSize = 20
-    TitleLabel.Parent = TopBar
-
-    -- Draggable System
-    local dragging, dragStart, startPos
-    TopBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-        end
-    end)
-    
-    TopBar.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-    
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    return {
-        Frame = MainFrame,
-        AddTab = function(self, tabName)
-            local TabButton = Instance.new("TextButton")
-            local TabFrame = Instance.new("Frame")
-
-            TabButton.Size = UDim2.new(0, 100, 0, 40)
-            TabButton.Text = tabName
-            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            TabButton.Parent = MainFrame
-            
-            TabFrame.Size = UDim2.new(1, 0, 1, -40)
-            TabFrame.Position = UDim2.new(0, 0, 0, 40)
-            TabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-            TabFrame.Visible = false
-            TabFrame.Parent = MainFrame
-            
-            TabButton.MouseEnter:Connect(function()
-                Tween(TabButton, {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}, 0.2)
-            end)
-            TabButton.MouseLeave:Connect(function()
-                Tween(TabButton, {BackgroundColor3 = Color3.fromRGB(50, 50, 50)}, 0.2)
-            end)
-            
-            TabButton.MouseButton1Click:Connect(function()
-                for _, v in pairs(MainFrame:GetChildren()) do
-                    if v:IsA("Frame") and v ~= TopBar and v ~= MainFrame then
-                        v.Visible = false
-                    end
-                end
-                TabFrame.Visible = true
-            end)
-            
-            return {
-                Frame = TabFrame,
-                AddButton = function(self, buttonText, callback)
-                    local Button = Instance.new("TextButton")
-                    Button.Size = UDim2.new(0.8, 0, 0, 40)
-                    Button.Position = UDim2.new(0.1, 0, 0, 10)
-                    Button.Text = buttonText
-                    Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-                    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    Button.Parent = TabFrame
-
-                    Button.MouseEnter:Connect(function()
-                        Tween(Button, {BackgroundColor3 = Color3.fromRGB(90, 90, 90)}, 0.2)
-                    end)
-                    Button.MouseLeave:Connect(function()
-                        Tween(Button, {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}, 0.2)
-                    end)
-
-                    Button.MouseButton1Click:Connect(callback)
-                end,
-                AddToggle = function(self, toggleText, callback)
-                    local Toggle = Instance.new("TextButton")
-                    local IsOn = false
-                    
-                    Toggle.Size = UDim2.new(0.8, 0, 0, 40)
-                    Toggle.Position = UDim2.new(0.1, 0, 0, 60)
-                    Toggle.Text = toggleText .. " (OFF)"
-                    Toggle.BackgroundColor3 = Color3.fromRGB(100, 60, 60)
-                    Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    Toggle.Parent = TabFrame
-                    
-                    Toggle.MouseButton1Click:Connect(function()
-                        IsOn = not IsOn
-                        Toggle.Text = toggleText .. (IsOn and " (ON)" or " (OFF)")
-                        Tween(Toggle, {BackgroundColor3 = IsOn and Color3.fromRGB(60, 100, 60) or Color3.fromRGB(100, 60, 60)}, 0.3)
-                        callback(IsOn)
-                    end)
-                end
-            }
-        end
-    }
+function CreateUIStroke(parent, thickness, color)
+	local UIStroke = Instance.new("UIStroke")
+	UIStroke.Thickness = thickness
+	UIStroke.Color = color
+	UIStroke.Parent = parent
 end
 
-return UILibrary
+function CreateUIGradient(parent)
+	local UIGradient = Instance.new("UIGradient")
+	UIGradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 80, 80)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+	}
+	UIGradient.Parent = parent
+end
+
+function Library:Tab(name)
+	local Tab = Instance.new("TextLabel")
+	local TabFrame = Instance.new("Frame")
+	local TabFrameSize = 0
+	local TabMouseLeft = true
+	local TabFrameMouseLeft = true
+	local DropDownFrameMouseLeft = true
+	local ButtonListLayout = Instance.new("UIListLayout")
+
+	Tab.Name = name
+	Tab.Parent = UILib
+	Tab.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	Tab.BorderSizePixel = 0
+	Tab.Position = UDim2.new(0, TabXPosition, 0, 30)
+	Tab.Size = UDim2.new(0, 120, 0, 25)
+	Tab.Font = Enum.Font.SciFi
+	Tab.Text = name
+	Tab.TextColor3 = Color3.new(1, 1, 1)
+	Tab.TextSize = 16
+	
+	CreateUICorner(Tab, 8)
+	CreateUIStroke(Tab, 2, Color3.fromRGB(255, 255, 255))
+	CreateUIGradient(Tab)
+
+	TabFrame.Name = "TabFrame"
+	TabFrame.Parent = Tab
+	TabFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	TabFrame.BorderSizePixel = 0
+	TabFrame.Position = UDim2.new(0, 0, 0, 25)
+	TabFrame.Size = UDim2.new(0, 120, 0, 0)
+
+	CreateUICorner(TabFrame, 8)
+	CreateUIStroke(TabFrame, 2, Color3.fromRGB(180, 180, 180))
+	CreateUIGradient(TabFrame)
+
+	ButtonListLayout.Parent = TabFrame
+	ButtonListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local TabLibrary = {}
+
+	function TabLibrary:Button(text, func)
+		TabFrameSize = TabFrameSize + 25
+		local Button = Instance.new("TextButton")
+		Button.Name = text
+		Button.Parent = TabFrame
+		Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		Button.Size = UDim2.new(0, 120, 0, 25)
+		Button.Font = Enum.Font.SciFi
+		Button.Text = " " .. text
+		Button.TextColor3 = Color3.new(1, 1, 1)
+		Button.TextSize = 16
+		Button.TextXAlignment = Enum.TextXAlignment.Left
+		Button.Visible = false
+
+		CreateUICorner(Button, 6)
+		CreateUIStroke(Button, 1.5, Color3.fromRGB(255, 255, 255))
+		CreateUIGradient(Button)
+
+		Button.MouseButton1Click:Connect(func)
+	end
+
+	return TabLibrary
+end
+
+return Library
