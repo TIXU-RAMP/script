@@ -1,56 +1,24 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAMP/T/refs/heads/main/Ch0ke-LIB/Code.lua"))()
+local VLib = loadstring(game:HttpGet("https://pastebin.com/raw/Mb49kKTP"))()
 
-local myWindow = library:CreateWindow("🔥 ROBLOX is life 🗣️")
+local win = VLib:Window("THREE PIECE", Color3.fromRGB(196, 40, 28))
 
-myWindow:AddButton("FAGGOT🤡", function()
-    print("✅️U BECAME A FAT FAGGOT✅️")
+local ss1 = win:Tab("HOW TO USE")
+local ss = win:Tab("MAIN")
+local sss = win:Tab("MISC")
+local cred = win:Tab("CREDITS")
+
+ss1:Button("Show Instructions", function()
+    print("Here are the instructions: ...") -- Replace with actual instructions
 end)
 
-myWindow:AddLabel("UR SO FUCKING FAT🖕!")
-
-myWindow:AddToggleWithSubtitle("KILL UR SELF", "NONE LIKES U.", function(state)
-    print("Gambling Mode:", state)
+ss:Button("Equip Tool", function()
+    print("Equipping tool...") -- Replace with logic to equip a tool
 end)
 
-myWindow:AddTextBoxWithSubtitle("📜 Enter your name", "Type your name here", function(text)
-    print("Name entered:", text)
+sss:Button("Spam Skill C", function()
+    print("Spamming skill C...") -- Replace with logic to spam skill C
 end)
 
--- Fly Function
-local function toggleFly()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/lilmond/roblox_fly_script/main/latest.lua'))()
-end
-
-myWindow:AddButton("🕊️ Toggle Fly", function()
-    toggleFly()
+cred:Button("Open Discord", function()
+    setclipboard("paste your discord link here") -- Replace with actual Discord link
 end)
-
--- Speed Boost
-local function speedBoost()
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("Humanoid") then
-        player.Character.Humanoid.WalkSpeed = 50
-    end
-end
-
-myWindow:AddButton("⚡ Speed Boost", function()
-    speedBoost()
-end)
-
--- Simple VFX Effect
-local function addParticleEffect()
-    local player = game.Players.LocalPlayer
-    if player and player.Character then
-        local char = player.Character
-        local particle = Instance.new("ParticleEmitter")
-        particle.Texture = "rbxassetid://24362244" -- Change to your desired texture
-        particle.Rate = 90999999999
-        particle.Lifetime = NumberRange.new(1, 2)
-        particle.Parent = char:FindFirstChild("HumanoidRootPart")
-    end
-end
-
-myWindow:AddButton("✨ Add VFX", function()
-    addParticleEffect()
-end)
-
