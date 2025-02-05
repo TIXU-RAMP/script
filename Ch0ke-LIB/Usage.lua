@@ -2,13 +2,13 @@ local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-
 
 local myWindow = library:CreateWindow("🔥 ROBLOX is life 🗣️")
 
-myWindow:AddButton("🚀 Click Me", function()
-    print("Button Clicked!")
+myWindow:AddButton("FAGGOT🤡", function()
+    print("✅️U BECAME A FAT FAGGOT✅️")
 end)
 
-myWindow:AddLabel("🎉 Welcome to the game!")
+myWindow:AddLabel("UR SO FUCKING FAT🖕!")
 
-myWindow:AddToggleWithSubtitle("🎲 Gambling Mode", "I like to gamble.", function(state)
+myWindow:AddToggleWithSubtitle("KILL UR SELF", "NONE LIKES U.", function(state)
     print("Gambling Mode:", state)
 end)
 
