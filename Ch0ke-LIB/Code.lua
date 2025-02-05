@@ -1,15 +1,12 @@
 local library = {}
-local windowCount = 0
-local windowOffset = 20
-local activeWindows = {}
 local uis = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
+local ts = game:GetService("TweenService")
 local players = game:GetService("Players")
-local localPlayer = players.LocalPlayer
-local mouse = localPlayer:GetMouse()
+local lp = players.LocalPlayer
+local mouse = lp:GetMouse()
 
-if game.CoreGui:FindFirstChild("Fevber Hub") then
-    game.CoreGui:FindFirstChild("Fevber Hub"):Destroy()
+if game.CoreGui:FindFirstChild("Overload_UI") then
+    game.CoreGui:FindFirstChild("Overload_UI"):Destroy()
 end
 
 local function protectGui(obj)
@@ -20,266 +17,158 @@ local function protectGui(obj)
 end
 
 local mainGui = Instance.new("ScreenGui")
-mainGui.Name = "Fevber Hub"
+mainGui.Name = "Overload_UI"
 protectGui(mainGui)
 
-local function tween(object, properties, duration)
-    game:GetService("TweenService"):Create(
-        object,
-        TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-        properties
-    ):Play()
+local function tween(obj, props, dur)
+    ts:Create(obj, TweenInfo.new(dur, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), props):Play()
 end
 
-local function createCorner(object)
+local function createCorner(obj, rad)
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = object
+    corner.CornerRadius = UDim.new(0, rad)
+    corner.Parent = obj
 end
 
-local function updateCanvasSize(content)
-    local totalHeight = 0
-    for _, child in pairs(content:GetChildren()) do
-        if child:IsA("TextButton") or child:IsA("TextLabel") or child:IsA("Frame") then
-            totalHeight = totalHeight + child.Size.Y.Offset + 10
-        end
-    end
-    content.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-end
-
-function library:CreateWindow(title)
-    windowCount += 1
-
+function library:CreateWindow(title, imgUrl)
     local window = Instance.new("Frame")
-    window.Name = "Window" .. windowCount
-    window.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    window.BorderSizePixel = 0
-    window.Size = UDim2.new(0, 220, 0, 40)
-    window.Position = UDim2.new(0, windowOffset, 0, 20)
+    window.Size = UDim2.new(0, 350, 0, 50)
+    window.Position = UDim2.new(0.2, 0, 0.2, 0)
+    window.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     window.Parent = mainGui
-    createCorner(window)
-    windowOffset += 240
+    createCorner(window, 15)
 
-    -- Fluent-inspired header with acrylic effect
+    local bgImage = Instance.new("ImageLabel")
+    bgImage.Size = UDim2.new(1, 0, 1, 0)
+    bgImage.BackgroundTransparency = 1
+    bgImage.Image = imgUrl or "rbxassetid://10833439242"
+    bgImage.ImageTransparency = 0.3
+    bgImage.Parent = window
+
     local header = Instance.new("Frame")
-    header.Size = UDim2.new(1, 0, 0, 40)
-    header.BackgroundTransparency = 0.5
-    header.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    header.BorderSizePixel = 0
+    header.Size = UDim2.new(1, 0, 0, 50)
+    header.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     header.Parent = window
-    createCorner(header)
+    createCorner(header, 15)
 
     local titleLabel = Instance.new("TextLabel")
-    titleLabel.Text = title or "Window"
-    titleLabel.Font = Enum.Font.SourceSans
-    titleLabel.TextSize = 18
+    titleLabel.Text = title or "Overload UI"
+    titleLabel.Font = Enum.Font.FredokaOne
+    titleLabel.TextSize = 20
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    titleLabel.BackgroundTransparency = 0.7
-    titleLabel.Size = UDim2.new(0.7, -40, 1, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Size = UDim2.new(0.7, 0, 1, 0)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.Position = UDim2.new(0, 20, 0, 0)
     titleLabel.Parent = header
 
-    local minimizeButton = Instance.new("TextButton")
-    minimizeButton.Text = "♤"
-    minimizeButton.Font = Enum.Font.SourceSansBold
-    minimizeButton.TextSize = 18
-    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    minimizeButton.BackgroundTransparency = 1
-    minimizeButton.Size = UDim2.new(0, 40, 0, 40)
-    minimizeButton.Position = UDim2.new(1, -40, 0, 0)
-    minimizeButton.Parent = header
-
-    -- Content section with smooth scrolling
-    local content = Instance.new("ScrollingFrame")
-    content.Size = UDim2.new(1, 0, 1, -40)
-    content.Position = UDim2.new(0, 0, 0, 40)
-    content.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    content.BorderSizePixel = 0
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, 0, 0, 250)
+    content.Position = UDim2.new(0, 0, 0, 50)
+    content.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    content.Visible = false
     content.Parent = window
-    createCorner(content)
-    content.CanvasSize = UDim2.new(0, 0, 0, 0)
-    content.ScrollBarThickness = 10
+    createCorner(content, 15)
 
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 10)
-    layout.Parent = content
+    local tabHolder = Instance.new("Frame")
+    tabHolder.Size = UDim2.new(1, 0, 0, 40)
+    tabHolder.Position = UDim2.new(0, 0, 0, 0)
+    tabHolder.BackgroundTransparency = 1
+    tabHolder.Parent = content
 
-    -- Minimize functionality
-    minimizeButton.MouseButton1Click:Connect(function()
+    local tabLayout = Instance.new("UIListLayout")
+    tabLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabLayout.Parent = tabHolder
+
+    local minimizeBtn = Instance.new("TextButton")
+    minimizeBtn.Text = "⏷"
+    minimizeBtn.Size = UDim2.new(0, 40, 0, 40)
+    minimizeBtn.Position = UDim2.new(1, -50, 0, 5)
+    minimizeBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeBtn.Font = Enum.Font.FredokaOne
+    minimizeBtn.TextSize = 20
+    minimizeBtn.Parent = header
+    createCorner(minimizeBtn, 15)
+
+    minimizeBtn.MouseButton1Click:Connect(function()
         content.Visible = not content.Visible
-        minimizeButton.Text = content.Visible and "_" or "+"
-        tween(window, {Size = content.Visible and UDim2.new(0, 220, 0, 200) or UDim2.new(0, 220, 0, 40)}, 0.2)
+        minimizeBtn.Text = content.Visible and "⏶" or "⏷"
+        tween(window, {Size = content.Visible and UDim2.new(0, 350, 0, 300) or UDim2.new(0, 350, 0, 50)}, 0.3)
     end)
 
-    local windowFunctions = {}
-
-    -- Add Button
-    function windowFunctions:AddButton(buttonText, callback)
-        local button = Instance.new("TextButton")
-        button.Text = buttonText or "Button"
-        button.Size = UDim2.new(1, -20, 0, 30)
-        button.Position = UDim2.new(0, 10, 0, 10)
-        button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        button.BorderSizePixel = 0
-        button.Font = Enum.Font.SourceSans
-        button.TextSize = 16
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.Parent = content
-        createCorner(button)
-        
-        updateCanvasSize(content)
-
-        button.MouseEnter:Connect(function()
-            tween(button, {BackgroundColor3 = Color3.fromRGB(70, 70, 70)}, 0.1)
+    local function dragify(obj)
+        local dragging, dragInput, dragStart, startPos
+        local function update(input)
+            local delta = input.Position - dragStart
+            obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+        obj.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = obj.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then dragging = false end
+                end)
+            end
         end)
-        button.MouseLeave:Connect(function()
-            tween(button, {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}, 0.1)
+        obj.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
         end)
-
-        button.MouseButton1Click:Connect(callback or function() end)
+        uis.InputChanged:Connect(function(input)
+            if input == dragInput and dragging then update(input) end
+        end)
     end
+    dragify(window)
 
-    function windowFunctions:AddLabel(labelText)
-        local label = Instance.new("TextLabel")
-        label.Text = labelText or "Label"
-        label.Size = UDim2.new(1, -20, 0, 30)
-        label.Position = UDim2.new(0, 10, 0, 10)
-        label.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-        label.BackgroundTransparency = 0.3
-        label.Font = Enum.Font.SourceSans
-        label.TextSize = 16
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Parent = content
-        createCorner(label)
-        
-        updateCanvasSize(content)
-    end
+    local tabs = {}
 
-    function windowFunctions:AddToggleWithSubtitle(toggleText, subtitleText, callback)
-        local toggleFrame = Instance.new("Frame")
-        toggleFrame.Size = UDim2.new(1, -20, 0, 60)
-        toggleFrame.Position = UDim2.new(0, 10, 0, 10)
-        toggleFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        toggleFrame.BorderSizePixel = 0
-        toggleFrame.Parent = content
-        createCorner(toggleFrame)
+    function tabs:CreateTab(tabName)
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Text = tabName
+        tabBtn.Size = UDim2.new(0, 100, 0, 35)
+        tabBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabBtn.Font = Enum.Font.FredokaOne
+        tabBtn.TextSize = 16
+        tabBtn.Parent = tabHolder
+        createCorner(tabBtn, 10)
 
-        -- Toggle Button
-        local toggleButton = Instance.new("TextButton")
-        toggleButton.Text = toggleText or "Toggle"
-        toggleButton.Size = UDim2.new(0, 50, 0, 30)
-        toggleButton.Position = UDim2.new(0, 0, 0, 0)
-        toggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        toggleButton.Font = Enum.Font.SourceSans
-        toggleButton.TextSize = 16
-        toggleButton.Parent = toggleFrame
+        local tabContent = Instance.new("Frame")
+        tabContent.Size = UDim2.new(1, 0, 1, -40)
+        tabContent.Position = UDim2.new(0, 0, 0, 40)
+        tabContent.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        tabContent.Parent = content
+        tabContent.Visible = false
+        createCorner(tabContent, 10)
 
-        -- Subtitle for Toggle
-        local subtitle = Instance.new("TextLabel")
-        subtitle.Text = subtitleText or "Subtitle"
-        subtitle.Size = UDim2.new(1, -20, 0, 20)
-        subtitle.Position = UDim2.new(0, 10, 0, 35)
-        subtitle.BackgroundTransparency = 1
-        subtitle.Font = Enum.Font.SourceSans
-        subtitle.TextSize = 14
-        subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
-        subtitle.TextXAlignment = Enum.TextXAlignment.Left
-        subtitle.Parent = toggleFrame
-
-        local state = false
-        toggleButton.MouseButton1Click:Connect(function()
-            state = not state
-            toggleButton.Text = state and "■" or "□"
-            toggleButton.BackgroundColor3 = state and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-            if callback then callback(state) end
+        tabBtn.MouseButton1Click:Connect(function()
+            for _, child in pairs(content:GetChildren()) do
+                if child:IsA("Frame") and child ~= tabHolder then
+                    child.Visible = false
+                end
+            end
+            tabContent.Visible = true
         end)
 
-        updateCanvasSize(content)
+        return {
+            AddLabel = function(text)
+                local lbl = Instance.new("TextLabel")
+                lbl.Text = text
+                lbl.Size = UDim2.new(1, -20, 0, 30)
+                lbl.Position = UDim2.new(0, 10, 0, 10)
+                lbl.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+                lbl.Font = Enum.Font.FredokaOne
+                lbl.TextSize = 16
+                lbl.Parent = tabContent
+                createCorner(lbl, 10)
+            end
+        }
     end
 
-    -- Add TextBox with Subtitle
-    function windowFunctions:AddTextBoxWithSubtitle(textBoxText, subtitleText, callback)
-        local textBoxFrame = Instance.new("Frame")
-        textBoxFrame.Size = UDim2.new(1, -20, 0, 60)
-        textBoxFrame.Position = UDim2.new(0, 10, 0, 10)
-        textBoxFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        textBoxFrame.BorderSizePixel = 0
-        textBoxFrame.Parent = content
-        createCorner(textBoxFrame)
-
-        local textBox = Instance.new("TextBox")
-        textBox.Text = textBoxText or ""
-        textBox.Size = UDim2.new(1, -20, 0, 30)
-        textBox.Position = UDim2.new(0, 10, 0, 0)
-        textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textBox.Font = Enum.Font.SourceSans
-        textBox.TextSize = 16
-        textBox.ClearTextOnFocus = false
-        textBox.Parent = textBoxFrame
-
-        local subtitle = Instance.new("TextLabel")
-        subtitle.Text = subtitleText or "Subtitle"
-        subtitle.Size = UDim2.new(1, -20, 0, 20)
-        subtitle.Position = UDim2.new(0, 10, 0, 35)
-        subtitle.BackgroundTransparency = 1
-        subtitle.Font = Enum.Font.SourceSans
-        subtitle.TextSize = 14
-        subtitle.TextColor3 = Color3.fromRGB(200, 200, 200)
-        subtitle.TextXAlignment = Enum.TextXAlignment.Left
-        subtitle.Parent = textBoxFrame
-
-        textBox.FocusLost:Connect(function()
-            if callback then callback(textBox.Text) end
-        end)
-
-        updateCanvasSize(content)
-    end
-
-    function dragify(window)
-dragToggle = nil
-dragSpeed = .28 -- You can edit this.
-dragInput = nil
-dragStart = nil
-dragPos = nil
-
-function updateInput(input)
-Delta = input.Position - dragStart
-Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
-game:GetService("TweenService"):Create(Frame, TweenInfo.new(.25), {Position = Position}):Play()
-end
-
-Window.InputBegan:Connect(function(input)
-if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
-dragToggle = true
-dragStart = input.Position
-startPos = Frame.Position
-input.Changed:Connect(function()
-if (input.UserInputState == Enum.UserInputState.End) then
-dragToggle = false
-end
-end)
-end
-end)
-
-window.InputChanged:Connect(function(input)
-if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-dragInput = input
-end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-if (input == dragInput and dragToggle) then
-updateInput(input)
-end
-end)
-end
-
-    return windowFunctions
+    return tabs
 end
 
 return library
