@@ -51,26 +51,83 @@ end
 
 end)
 --//TELEPORTS\\--
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
+
+sss:Button("Death Counter", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    if character then
+        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+    end
+end)
