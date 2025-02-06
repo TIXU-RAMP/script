@@ -10,7 +10,8 @@ local ss = win:Tab("Attacks")
 local sss = win:Tab("Teleports")
 local cred = win:Tab("Emotes")
 
- 
+
+--//ATTACKS\\--
  ss:Toggle("Auto Farm",function(t)
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -49,3 +50,27 @@ while wait(000000000000000000000000000000000000000000000000000000000000000000000
 end
 
 end)
+--//TELEPORTS\\--
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
+
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
+
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
+
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
+
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
+
+cred:Button("Copy Discord Server",function()
+setclipboard("paste your discord link here")
+end) 
