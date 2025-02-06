@@ -56,7 +56,7 @@ sss:Button("Death Counter", function()
     local character = player.Character or player.CharacterAdded:Wait()
 
     if character then
-        character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
+        character:MoveTo(Vector3.new(1064.5374755859375, 131.3507080078125, 23007.78125)
     end
 end)
 
