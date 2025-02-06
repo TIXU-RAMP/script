@@ -177,7 +177,7 @@ function VLib:Window(textgame)
 	CircleName.BackgroundTransparency = 1.000
 	CircleName.Size = UDim2.new(0, 38, 0, 37)
 	CircleName.Font = Enum.Font.Gotham
-	CircleName.Text = "FEV"
+	CircleName.Text = "TIX"
 	CircleName.TextColor3 = Color3.fromRGB(255, 255, 255)
 	CircleName.TextSize = 16.000
 
