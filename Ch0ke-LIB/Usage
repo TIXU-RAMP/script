@@ -131,3 +131,35 @@ sss:Button("Death Counter", function()
         character:MoveTo(Vector3.new(-64.56, 29.25, 20336.39))
     end
 end)
+--//EMOTE\\--
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
+
+sss:Button("Death Counter", function()
+    game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):LoadAnimation(Instance.new("Animation", game.Players.LocalPlayer.Character):SetAttribute("AnimationId", "rbxassetid://113876851900426")):Play()
+end)
