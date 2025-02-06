@@ -5,21 +5,104 @@ local VLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAM
 
 local win = VLib:Window("THREE PIECE", Color3.fromRGB(196, 40, 28))
 
-local ss1 = win:Tab("HOW TO USE!")
-local ss = win:Tab("MAIN")
-local sss = win:Tab("MISC")
-local cred = win:Tab("CREDITS")
+local ss1 = win:Tab("Main!")
+local ss = win:Tab("Attacks")
+local sss = win:Tab("Teleports")
+local cred = win:Tab("Emotes")
 
-ss1:Button("Destroy Gui",function()
-game.CoreGui["Library"]:Destroy()
+ss:Toggle("Hakari",function(t)
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Freeze player in the sky
+humanoidRootPart.Position = humanoidRootPart.Position + Vector3.new(0, 20, 0)
+humanoidRootPart.Anchored = true
+
+-- Play animation
+local animation = Instance.new("Animation")
+animation.AnimationId = "rbxassetid://107649573628906"
+local animator = character:FindFirstChildOfClass("Humanoid"):FindFirstChildOfClass("Animator") or character:FindFirstChildOfClass("Humanoid"):WaitForChild("Animator")
+local track = animator:LoadAnimation(animation)
+track:Play()
+
+-- Trigger VFX
+local Test = game:GetService("ReplicatedStorage").Resources.Dragon.Explosion.Part.WindFast
+local test = Test:Clone()
+test.Parent = humanoidRootPart
+
+for _, child in ipairs(test:GetChildren()) do
+    if child:IsA("ParticleEmitter") then
+        child:Emit(900)
+        child.Enabled = true
+    end
+end
+
+-- Play Sound Effect
+local url = "https://raw.githubusercontent.com/TIXU-RAMP/Hakari/main/hakari-never-aquired-reverse-cursed-technique-made-with-Voicemod.mp3"
+local fileName = "Gojo's_maximum_hollow_purple.mp3"
+
+if not isfile(fileName) then
+    writefile(fileName, game:HttpGet(url))
+end
+
+local sound = Instance.new("Sound")
+sound.SoundId = getcustomasset(fileName)
+sound.Volume = 1
+sound.Looped = false
+sound.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+sound:Play()
+
+-- Display manga-style text
+function mangaTxt(t)
+    local ts = game:GetService("TweenService")
+    local Dialogue = Instance.new("BillboardGui")
+    local Chat1 = Instance.new("Frame")
+    local Sub = Instance.new("TextLabel")
+
+    Dialogue.Active = true
+    Dialogue.Size = UDim2.new(15, 0, 15, 0)
+    Dialogue.StudsOffset = Vector3.new(0, 0, 2)
+    Dialogue.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    Dialogue.Parent = humanoidRootPart
+
+    Chat1.AnchorPoint = Vector2.new(0.5, 0.5)
+    Chat1.BackgroundColor3 = Color3.new(1, 1, 1)
+    Chat1.BorderSizePixel = 2
+    Chat1.Position = UDim2.new(0.6, 0, -0.2, 0)
+    Chat1.Size = UDim2.new(0.1, 0, 0.2, 0)
+    Chat1.BackgroundTransparency = 1
+    Chat1.Parent = Dialogue
+
+    Sub.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Bold, Enum.FontStyle.Italic)
+    Sub.Text = t
+    Sub.TextColor3 = Color3.new(0, 0, 0)
+    Sub.TextScaled = true
+    Sub.TextTransparency = 1
+    Sub.BorderSizePixel = 0
+    Sub.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Sub.Size = UDim2.new(0.85, 0, 0.35, 0)
+    Sub.Parent = Chat1
+
+    game.Debris:AddItem(Chat1, 25)
+    game.Debris:AddItem(Sub, 25)
+
+    local function tweenProperty(object, properties, time)
+        local tweenInfo = TweenInfo.new(time, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local tween = ts:Create(object, tweenInfo, properties)
+        tween:Play()
+    end
+
+    tweenProperty(Chat1, {BackgroundTransparency = 0}, 1)
+    tweenProperty(Sub, {TextTransparency = 0}, 1)
+    tweenProperty(Chat1, {Position = UDim2.new(0.6, 0, 0.4, 0)}, 1)
+    task.wait(4)
+    tweenProperty(Chat1, {BackgroundTransparency = 1}, 2)
+    tweenProperty(Sub, {TextTransparency = 1}, 2)
+end
+
+mangaTxt("IM DONE PLAYING AROUND")
 end)
-
-local Npc_Table = {}     
-for i,v in pairs(game:GetService("Workspace"):GetChildren()) do 
-    if v:IsA("Model") and v:FindFirstChild("NPC") and v:FindFirstChild("AttackScript") and not table.find(Npc_Table,v.Name) then
-        table.insert(Npc_Table,v.Name)
-    end 
-end 
 
     local tool_table = {}
     for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
