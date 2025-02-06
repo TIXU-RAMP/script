@@ -10,264 +10,42 @@ local ss = win:Tab("Attacks")
 local sss = win:Tab("Teleports")
 local cred = win:Tab("Emotes")
 
-ss:Toggle("Hakari",function(t)
+ 
+ ss:Toggle("Auto Farm",function(t)
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local hrp = character:WaitForChild("HumanoidRootPart")
 
--- Freeze player in the sky
-humanoidRootPart.Position = humanoidRootPart.Position + Vector3.new(0, 20, 0)
-humanoidRootPart.Anchored = true
+local function getNearestPlayer()
+    local nearestPlayer = nil
+    local shortestDistance = math.huge
 
--- Play animation
-local animation = Instance.new("Animation")
-animation.AnimationId = "rbxassetid://107649573628906"
-local animator = character:FindFirstChildOfClass("Humanoid"):FindFirstChildOfClass("Animator") or character:FindFirstChildOfClass("Humanoid"):WaitForChild("Animator")
-local track = animator:LoadAnimation(animation)
-track:Play()
-
--- Trigger VFX
-local Test = game:GetService("ReplicatedStorage").Resources.Dragon.Explosion.Part.WindFast
-local test = Test:Clone()
-test.Parent = humanoidRootPart
-
-for _, child in ipairs(test:GetChildren()) do
-    if child:IsA("ParticleEmitter") then
-        child:Emit(900)
-        child.Enabled = true
-    end
-end
-
--- Play Sound Effect
-local url = "https://raw.githubusercontent.com/TIXU-RAMP/Hakari/main/hakari-never-aquired-reverse-cursed-technique-made-with-Voicemod.mp3"
-local fileName = "Gojo's_maximum_hollow_purple.mp3"
-
-if not isfile(fileName) then
-    writefile(fileName, game:HttpGet(url))
-end
-
-local sound = Instance.new("Sound")
-sound.SoundId = getcustomasset(fileName)
-sound.Volume = 1
-sound.Looped = false
-sound.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-sound:Play()
-
--- Display manga-style text
-function mangaTxt(t)
-    local ts = game:GetService("TweenService")
-    local Dialogue = Instance.new("BillboardGui")
-    local Chat1 = Instance.new("Frame")
-    local Sub = Instance.new("TextLabel")
-
-    Dialogue.Active = true
-    Dialogue.Size = UDim2.new(15, 0, 15, 0)
-    Dialogue.StudsOffset = Vector3.new(0, 0, 2)
-    Dialogue.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Dialogue.Parent = humanoidRootPart
-
-    Chat1.AnchorPoint = Vector2.new(0.5, 0.5)
-    Chat1.BackgroundColor3 = Color3.new(1, 1, 1)
-    Chat1.BorderSizePixel = 2
-    Chat1.Position = UDim2.new(0.6, 0, -0.2, 0)
-    Chat1.Size = UDim2.new(0.1, 0, 0.2, 0)
-    Chat1.BackgroundTransparency = 1
-    Chat1.Parent = Dialogue
-
-    Sub.FontFace = Font.new("rbxassetid://12187375716", Enum.FontWeight.Bold, Enum.FontStyle.Italic)
-    Sub.Text = t
-    Sub.TextColor3 = Color3.new(0, 0, 0)
-    Sub.TextScaled = true
-    Sub.TextTransparency = 1
-    Sub.BorderSizePixel = 0
-    Sub.Position = UDim2.new(0.5, 0, 0.5, 0)
-    Sub.Size = UDim2.new(0.85, 0, 0.35, 0)
-    Sub.Parent = Chat1
-
-    game.Debris:AddItem(Chat1, 25)
-    game.Debris:AddItem(Sub, 25)
-
-    local function tweenProperty(object, properties, time)
-        local tweenInfo = TweenInfo.new(time, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local tween = ts:Create(object, tweenInfo, properties)
-        tween:Play()
-    end
-
-    tweenProperty(Chat1, {BackgroundTransparency = 0}, 1)
-    tweenProperty(Sub, {TextTransparency = 0}, 1)
-    tweenProperty(Chat1, {Position = UDim2.new(0.6, 0, 0.4, 0)}, 1)
-    task.wait(4)
-    tweenProperty(Chat1, {BackgroundTransparency = 1}, 2)
-    tweenProperty(Sub, {TextTransparency = 1}, 2)
-end
-
-mangaTxt("IM DONE PLAYING AROUND")
-end)
-
-    local tool_table = {}
-    for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-        if v:IsA("Tool") then
-            table.insert(tool_table, v.Name)
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (hrp.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            if distance < shortestDistance then
+                shortestDistance = distance
+                nearestPlayer = otherPlayer
+            end
         end
     end
-    
-    distance = 5 
-    
-    
-     ss1:Label("You need to have a fruit inorder to hit mobs")
-     ss1:Label("Once you have a fruit auto equip it")
-     ss1:Label("then Spam Skills From Misc Tab")
- 
- 
-ss:Dropdown("Select Tool",tool_table,function(SelectedOption)
-SelectedWeapon = SelectedOption
-end)
-    
-ss:Toggle("AutoEquip",function(t)
- Equip = t 
-    while wait() do 
-         if Equip then 
-           pcall(function()
-              for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-                 if v.Name == SelectedWeapon then 
-                     game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
-                   end 
-                end
-            end)
-        end 
-    end 
-end)  
-    
-ss:Dropdown("Mobs To Farm",Npc_Table,function(t)
-mobs = t     
-end) 
 
-ss:Toggle("Autofarm Start",function(t)
-    autofarm = t 
-    game:GetService("RunService").Stepped:Connect(function()
-    if autofarm then
-                    pcall(function()
-        game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
-    end)
+    return nearestPlayer
 end
-end)
-                while autofarm do wait()
-                    pcall(
-                        function()
-                            for i, v in pairs(game:GetService("Workspace"):GetChildren()) do
-                                if v.Name == mobs and v:FindFirstChild("HumanoidRootPart")and v:FindFirstChild("Humanoid") then
-                                   wait(.7)
-                                    repeat
-                                        wait()
-                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =  CFrame.new(v.HumanoidRootPart.Position + Vector3.new(0,distance,0),v.HumanoidRootPart.Position)
-                                    until v.Humanoid.Health <= 0  or autofarm == false 
-                                end
-                            end
-                        end
-                    )
-                end
-            
-end) 
 
- ss:Slider("Distance",-9,10,3,function(t)
- distance = t     
- end)
- 
- ss:Toggle("AutoFarm Fruits",function(t)
-fruits = t 
- while fruits do wait() 
-     pcall(function()
-for i,v in pairs(game:GetService("Workspace"):GetDescendants()) do
-    if v:IsA("Tool") and v:FindFirstChild("EatScript") then 
-         firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Handle.TouchInterest.Parent, 0)
-            end 
-        end 
-     end)  
-  end 
-end) 
- 
-
-sss:Toggle("Spam C Skill",function(t)
-skillsC = t 
-while skillsC do wait() 
-    pcall(function()
-            local LP = game:GetService("Players").LocalPlayer
-            local VIM = game:GetService("VirtualInputManager")
-         VIM:SendKeyEvent(true, Enum.KeyCode.C, false, game)
-        end) 
+local function teleportBehindTarget()
+    local target = getNearestPlayer()
+    if target and target.Character then
+        local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
+        if targetHRP then
+            local behindPosition = targetHRP.Position - (targetHRP.CFrame.LookVector * 3)
+            hrp.CFrame = CFrame.new(behindPosition, targetHRP.Position)
+        end
     end
-end)
-            
-sss:Toggle("Spam X Skill",function(t)
-skillsX = t 
-while skillsX do wait() 
-    pcall(function()
-            local LP = game:GetService("Players").LocalPlayer
-            local VIM = game:GetService("VirtualInputManager")
-         VIM:SendKeyEvent(true, Enum.KeyCode.X, false, game)
-        end)
-    end
-end)
-            
-sss:Toggle("Spam V Skill",function(t)
-skillsV = t 
-    pcall(function()
-while skillsV do wait() 
-            local LP = game:GetService("Players").LocalPlayer
-            local VIM = game:GetService("VirtualInputManager")
-         VIM:SendKeyEvent(true, Enum.KeyCode.V, false, game)
-        end 
-    end)
-end)
-        
-sss:Toggle("Spam E Skill",function(t)
-skills = t 
-while skills do wait() 
-    pcall(function()
-            local LP = game:GetService("Players").LocalPlayer
-            local VIM = game:GetService("VirtualInputManager")
-         VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-       end)
-    end
-end)
-          
-sss:Toggle("Spam Z Skill",function(t)
-skillsZ = t 
-while skillsZ do wait() 
-    pcall(function()
-            local LP = game:GetService("Players").LocalPlayer
-            local VIM = game:GetService("VirtualInputManager")
-         VIM:SendKeyEvent(true, Enum.KeyCode.Z, false, game)
-        end)
-     end
-end)
+end
 
-cred:Button("Copy Discord Server",function()
-setclipboard("paste your discord link here")
-end) 
+while wait(000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.1) do
+    teleportBehindTarget()
+end
 
-cred:Label("MADE BY ââ·âNiceBBMB#5242")
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ScreenGui"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false
- 
-local Toggle = Instance.new("TextButton")
-Toggle.Name = "Toggle"
-Toggle.Parent = ScreenGui
-Toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Toggle.Position = UDim2.new(0, 0, 0.454706937, 0)
-Toggle.Size = UDim2.new(0, 90, 0, 38)
-Toggle.Font = Enum.Font.SourceSans
-Toggle.Text = "🌐"
-Toggle.TextColor3 = Color3.fromRGB(248, 248, 248)
-Toggle.TextSize = 28.000
-Toggle.Draggable = true
-Toggle.MouseButton1Click:connect(function()
-    Library:ToggleUI()
 end)
- 
-local Corner = Instance.new("UICorner")
-Corner.Name = "Corner"
-Corner.Parent = Toggle
