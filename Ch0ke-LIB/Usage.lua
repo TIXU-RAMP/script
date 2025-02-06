@@ -60,7 +60,7 @@ sss:Button("Death Counter", function()
     end
 end)
 
-sss:Button("Death Counter", function()
+sss:Button("Atomic Ball", function()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
 
