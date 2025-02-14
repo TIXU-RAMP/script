@@ -1,0 +1,140 @@
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+local UILib = {}
+
+function UILib.createUIElement(className, properties)
+    local element = Instance.new(className)
+    for prop, value in pairs(properties) do
+        element[prop] = value
+    end
+    return element
+end
+
+function UILib.addUICorner(parent, cornerRadius)
+    UILib.createUIElement("UICorner", {
+        CornerRadius = cornerRadius or UDim.new(0.1, 0),
+        Parent = parent
+    })
+end
+
+function UILib.addUIStroke(parent, color, thickness)
+    UILib.createUIElement("UIStroke", {
+        Parent = parent,
+        Color = color or Color3.fromRGB(255, 255, 255),
+        Thickness = thickness or 2
+    })
+end
+
+function UILib.addHoverAnimation(button, hoverColor, originalColor)
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+    end)
+end
+
+local gui = UILib.createUIElement("ScreenGui", { Name = "FevberAdminUI", Parent = game.CoreGui })
+
+local mainFrame = UILib.createUIElement("Frame", {
+    Name = "MainFrame",
+    Parent = gui,
+    Size = UDim2.new(0.4, 0, 0.5, 0),
+    Position = UDim2.new(0.3, 0, 0.25, 0),
+    BackgroundColor3 = Color3.fromRGB(35, 35, 45),
+    BackgroundTransparency = 0.2,
+    BorderSizePixel = 0,
+    Draggable = true,
+    Active = true
+})
+UILib.addUICorner(mainFrame, UDim.new(0.1, 0))
+UILib.addUIStroke(mainFrame, Color3.fromRGB(150, 150, 255), 2)
+
+local title = UILib.createUIElement("TextLabel", {
+    Name = "Title",
+    Parent = mainFrame,
+    Size = UDim2.new(1, 0, 0.12, 0),
+    BackgroundTransparency = 1,
+    Text = "Fevber Admin Panel",
+    Font = Enum.Font.GothamBold,
+    TextSize = 24,
+    TextColor3 = Color3.fromRGB(200, 200, 255),
+    TextXAlignment = Enum.TextXAlignment.Center
+})
+
+local closeButton = UILib.createUIElement("TextButton", {
+    Name = "CloseButton",
+    Parent = mainFrame,
+    Size = UDim2.new(0.08, 0, 0.08, 0),
+    Position = UDim2.new(0.92, 0, 0.02, 0),
+    BackgroundColor3 = Color3.fromRGB(255, 80, 80),
+    Text = "✖",
+    Font = Enum.Font.GothamBold,
+    TextSize = 18,
+    TextColor3 = Color3.fromRGB(255, 255, 255)
+})
+UILib.addUICorner(closeButton, UDim.new(0.5, 0))
+UILib.addHoverAnimation(closeButton, Color3.fromRGB(255, 100, 100), Color3.fromRGB(255, 80, 80))
+closeButton.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+local hideButton = UILib.createUIElement("ImageButton", {
+    Name = "HideButton",
+    Parent = mainFrame,
+    Size = UDim2.new(0.08, 0, 0.08, 0),
+    Position = UDim2.new(0.82, 0, 0.02, 0),
+    BackgroundTransparency = 1,
+    Image = "rbxassetid://111232189437801"
+})
+hideButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+
+local commandBox = UILib.createUIElement("TextBox", {
+    Name = "CommandBox",
+    Parent = mainFrame,
+    Size = UDim2.new(0.7, 0, 0.1, 0),
+    Position = UDim2.new(0.05, 0, 0.15, 0),
+    BackgroundColor3 = Color3.fromRGB(50, 50, 70),
+    PlaceholderText = "Type a command...",
+    Font = Enum.Font.Gotham,
+    TextSize = 16,
+    TextColor3 = Color3.fromRGB(220, 220, 255),
+    ClearTextOnFocus = false
+})
+UILib.addUICorner(commandBox, UDim.new(0.05, 0))
+UILib.addUIStroke(commandBox, Color3.fromRGB(100, 100, 255), 1)
+
+local executeButton = UILib.createUIElement("TextButton", {
+    Name = "ExecuteButton",
+    Parent = mainFrame,
+    Size = UDim2.new(0.2, 0, 0.1, 0),
+    Position = UDim2.new(0.78, 0, 0.15, 0),
+    BackgroundColor3 = Color3.fromRGB(80, 180, 100),
+    Text = "Run",
+    Font = Enum.Font.GothamBold,
+    TextSize = 16,
+    TextColor3 = Color3.fromRGB(255, 255, 255)
+})
+UILib.addUICorner(executeButton, UDim.new(0.05, 0))
+UILib.addHoverAnimation(executeButton, Color3.fromRGB(100, 200, 120), Color3.fromRGB(80, 180, 100))
+
+local notifications = UILib.createUIElement("Frame", {
+    Name = "Notifications",
+    Parent = gui,
+    Size = UDim2.new(0.3, 0, 0.3, 0),
+    Position = UDim2.new(0.7, 0, 0.05, 0),
+    BackgroundTransparency = 1
+})
+
+function UILib.notify(text, duration)
+    local notification = UILib.createUIElement("TextLabel", {
+        Parent = notifications,
+        Size = UDim2.new(1, 0, 0, 40),
+        BackgroundColor3 = Color3.fromRGB(50, 50, 80),
+        Text = text,
+        Font = Enum.Font.Gotham,
+        TextSize = 14,
+        TextColor3 = Color3.from
