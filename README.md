@@ -1,13 +1,7 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TIXU-RAMP/T/refs/heads/main/Libary.lua"))()
+## yes i changed my namd to fevber to tixu
 
-local myWindow = library:CreateWindow("ROBLOx is life🔥🗣")
+# 👑 ill make script that are opens source with rich details 
 
-myWindow:AddButton("Click Me", function()
-    print("Button Clicked!")
-end)
+# 🦠 its open source so u cam change anything give me credit and u can fix bugs
 
-myWindow:AddLabel("This is a label.")
-
-myWindow:AddToggleWithSubtitle("🔥", "i like to gamble.", function(state)
-    print("Toggle is now:", state)
-end)
+## yippe
