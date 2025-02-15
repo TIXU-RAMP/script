@@ -10,7 +10,7 @@ local cred = win:Tab("Emotes")
 
 local spamEnabled = false
 local teleportDistance = 3
-local teleportDelay = 0000000000000000.1
+local teleportDelay = 000000000000000000000000000000000000000000000000000000000000000000000000000000000.1
 
 -- Function to fire server events (left click)
 local function fireServer(args)
@@ -26,7 +26,7 @@ local function leftClick()
         }
     }
     fireServer(args1)
-    wait(0000000000000000.1)
+    wait(000000000000000000000000000000000000000000000000000000000000000000000000000000000.1)
 
     local args2 = {
         [1] = {
@@ -81,33 +81,28 @@ ss1:Toggle("AUTO FARM", function(t)
     spamEnabled = t
     if spamEnabled then
         task.spawn(function()
-            while spamEnabled do
-                -- Simulate left-click and teleport behind nearest player
+            while spamEnabled 
                 leftClick()
                 teleportBehindTarget()
 
-                -- Spam keys 1, 2, 3, 4, and G
                 sendKeyEvent(true, Enum.KeyCode.One)
                 sendKeyEvent(true, Enum.KeyCode.Two)
                 sendKeyEvent(true, Enum.KeyCode.Three)
                 sendKeyEvent(true, Enum.KeyCode.Four)
                 sendKeyEvent(true, Enum.KeyCode.G)
 
-                -- Release the keys after spam
                 sendKeyEvent(false, Enum.KeyCode.One)
                 sendKeyEvent(false, Enum.KeyCode.Two)
                 sendKeyEvent(false, Enum.KeyCode.Three)
                 sendKeyEvent(false, Enum.KeyCode.Four)
                 sendKeyEvent(false, Enum.KeyCode.G)
 
-                -- Delay between actions
                 task.wait(teleportDelay)
             end
         end)
     end
 end)
 
--- Optional: Add a button to stop the spamming
 ss1:Button("Hi bruh", function()
     spamEnabled = false
 end)
