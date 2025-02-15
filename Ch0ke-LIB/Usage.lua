@@ -104,3 +104,18 @@ ss:Toggle("AUTO FARM", function(t)
 end)
 
 ss:Label(" The auto farm maybe choppy")
+
+sss:Dropdown("Teleport to Player", {}, function(choice)  
+    local player = game.Players:FindFirstChild(choice)  
+    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then  
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame  
+    end  
+end)
+
+game.Players.PlayerAdded:Connect(function(player)  
+    sss:UpdateDropdown("Teleport to Player", game.Players:GetPlayers())  
+end)  
+
+game.Players.PlayerRemoving:Connect(function(player)  
+    sss:UpdateDropdown("Teleport to Player", game.Players:GetPlayers())  
+end)  
