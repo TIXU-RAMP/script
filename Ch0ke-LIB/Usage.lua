@@ -77,7 +77,7 @@ local function teleportBehindTarget()
 end
 
 -- Toggle for spamming left-click, keys, and teleporting
-ss1:Toggle("AUTO FARM", function(t)
+ss:Toggle("AUTO FARM", function(t)
     spamEnabled = t
     if spamEnabled then
         task.spawn(function()
@@ -103,6 +103,4 @@ ss1:Toggle("AUTO FARM", function(t)
     end
 end)
 
-ss1:Button("Hi bruh", function()
-    spamEnabled = false
-end)
+ss:Label(" The auto farm maybe choppy")
